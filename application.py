@@ -8,13 +8,13 @@ from models.funiegan import GeneratorFunieGAN
 from flask import Flask, request, jsonify
 import io
 
-app = Flask(__name__)
+application = Flask(__name__)
 
 def enhance_image(input_image):
 
 
     # Check the path of trained model
-    model_path = os.path.join("trained/FUnIE_GAN/test/generator_95.pth")
+    model_path = os.path.join("trained/generator_95.pth")
     assert exists(model_path), "model weights not found"
 
     # Set device for pytorch
@@ -48,7 +48,7 @@ def enhance_image(input_image):
     enhanced_image = Image.open("enhance.jpg")  # Placeholder, replace this with your actual code
     return enhanced_image
 
-@app.route('/enhance', methods=['POST'])
+@application.route('/enhance', methods=['POST'])
 def enhance():
     try:
         # Get the image from the request
@@ -68,6 +68,6 @@ def enhance():
         return jsonify({'error': str(e)})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    application.run(host='0.0.0.0', port=5000)
 
 
