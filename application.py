@@ -11,13 +11,14 @@ import io
 import base64
 
 application = Flask(__name__)
-CORS(app)
+CORS(application, origins='*')
+
 
 def enhance_image(input_image):
 
 
     # Check the path of trained model
-    model_path = os.path.join("trained/FUnIE_GAN/test/generator_95.pth")
+    model_path = os.path.join("trained/generator_95.pth")
     assert exists(model_path), "model weights not found"
 
     # Set device for pytorch
@@ -51,7 +52,7 @@ def enhance_image(input_image):
     enhanced_image = Image.open("enhance.jpg")  # Placeholder, replace this with your actual code
     return enhanced_image
 
-@app.route('/enhance', methods=['POST'])
+@application.route('/enhance', methods=['POST'])
 def enhance():
     try:
         # Get the image from the request
