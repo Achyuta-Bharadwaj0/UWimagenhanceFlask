@@ -1,20 +1,23 @@
 import os
 import torch
 from PIL import Image
-from os.path import exists, basename
+from os.path import exists
 from torchvision.utils import save_image
 import torchvision.transforms as transforms
 from models.funiegan import GeneratorFunieGAN
 from flask import Flask, request, jsonify
+from flask_cors import CORS  # Import the CORS module
 import io
+import base64
 
 application = Flask(__name__)
+CORS(app)
 
 def enhance_image(input_image):
 
 
     # Check the path of trained model
-    model_path = os.path.join("trained/generator_95.pth")
+    model_path = os.path.join("trained/FUnIE_GAN/test/generator_95.pth")
     assert exists(model_path), "model weights not found"
 
     # Set device for pytorch
@@ -48,7 +51,7 @@ def enhance_image(input_image):
     enhanced_image = Image.open("enhance.jpg")  # Placeholder, replace this with your actual code
     return enhanced_image
 
-@application.route('/enhance', methods=['POST'])
+@app.route('/enhance', methods=['POST'])
 def enhance():
     try:
         # Get the image from the request
@@ -61,9 +64,13 @@ def enhance():
         # Convert the enhanced image to bytes
         enhanced_image_bytes = io.BytesIO()
         enhanced_image.save(enhanced_image_bytes, format='JPEG')
-        enhanced_image_bytes = enhanced_image_bytes.getvalue()
+        enhanced_image_bytes.seek(0)
 
-        return jsonify({'enhanced_image': enhanced_image_bytes.decode('latin-1')})
+        # Return the enhanced image as base64-encoded string
+        encoded_image = base64.b64encode(enhanced_image_bytes.read()).decode('utf-8')
+
+        return jsonify({'encoded_image': encoded_image})
+
     except Exception as e:
         return jsonify({'error': str(e)})
 
